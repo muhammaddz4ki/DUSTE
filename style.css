@@ -4,8 +4,8 @@
     --primary-color-light: #000000;
     --secondary-color-light: #333333;
     --light-gray-color-light: #f4f4f4;
-    --background-color-light: #f9f9f7;
-    --white-color-light: #ffffff;
+    --background-color-light: #f9f9f7; /* Slightly off-white for main background */
+    --white-color-light: #ffffff; /* True white for cards, headers etc. */
     --accent-color-light: #B08D57; /* Emas tua/coklat muda */
     --text-color-light: #333333;
     --text-color-inverted-light: #ffffff;
@@ -28,15 +28,15 @@
     /* Dark Theme */
     --primary-color-dark: #ffffff;
     --secondary-color-dark: #bbbbbb;
-    --light-gray-color-dark: #2a2a2a;
-    --background-color-dark: #121212;
-    --white-color-dark: #1e1e1e; /* Untuk elemen yang tadinya putih, seperti kartu */
+    --light-gray-color-dark: #2a2a2a; /* For bg-light sections in dark mode */
+    --background-color-dark: #121212; /* Main dark background */
+    --white-color-dark: #1e1e1e; /* For elements that were white, like cards */
     --accent-color-dark: #cfa76e; /* Emas lebih terang untuk dark mode */
     --text-color-dark: #e0e0e0;
     --text-color-inverted-dark: #000000;
     --heading-color-dark: #ffffff;
     --border-color-dark: #444444;
-    --card-bg-dark: #1e1e1e;
+    --card-bg-dark: #1e1e1e; /* Card background in dark mode */
     --shadow-color-dark: rgba(255,255,255,0.05);
     --input-border-color-dark: #555555;
     --input-focus-border-dark: var(--accent-color-dark);
@@ -159,7 +159,7 @@ textarea:focus-visible {
     outline-offset: 2px;
 }
 
-h1, h2, h3 {
+h1, h2, h3, h4 {
     color: var(--heading-color);
     margin-bottom: 1rem;
     font-weight: 700;
@@ -199,7 +199,7 @@ h2.section-title::after {
 
 /* Header & Navigasi */
 header {
-    background: var(--card-bg);
+    background: var(--card-bg); /* Use card-bg for header for theme consistency */
     padding: 0.8rem 0;
     border-bottom: 1px solid var(--border-color);
     position: sticky;
@@ -231,12 +231,12 @@ header nav ul {
 }
 
 header nav ul li {
-    margin-left: 25px;
+    margin-left: 22px; /* Adjust as needed for new items */
 }
 
 header nav ul li a {
     font-weight: 500;
-    font-size: 0.95rem;
+    font-size: 0.88rem; /* Slightly smaller to fit more items if needed */
     color: var(--text-color);
     transition: color 0.3s ease, border-bottom-color 0.3s ease;
     padding-bottom: 5px;
@@ -248,7 +248,7 @@ header nav ul li a::after {
     position: absolute;
     width: 0;
     height: 2px;
-    bottom: -2px;
+    bottom: -2px; /* Ensure this doesn't make nav jump on hover */
     left: 50%;
     transform: translateX(-50%);
     background-color: var(--accent-color);
@@ -256,13 +256,14 @@ header nav ul li a::after {
 }
 
 header nav ul li a:hover::after,
-header nav ul li a.active-link::after {
+header nav ul li a.active-link::after { /* Add .active-link for JS to mark active section */
     width: 100%;
 }
 header nav ul li a:hover,
 header nav ul li a.active-link {
    color: var(--accent-color);
 }
+
 
 .controls {
     display: flex;
@@ -304,13 +305,13 @@ header nav ul li a.active-link {
     cursor: pointer;
 }
 
-/* Hero Section */
+/* Hero Section - Penyesuaian untuk Slideshow */
 #hero {
     min-height: calc(100vh - var(--header-height));
     display: flex;
     align-items: center;
     background-color: var(--background-color);
-    padding: 3rem 0;
+    padding: 2rem 0; /* Sesuaikan padding jika perlu */
     overflow: hidden;
 }
 
@@ -318,16 +319,18 @@ header nav ul li a.active-link {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 3rem;
+    gap: 2rem; /* Reduced gap slightly */
+    width: 100%; /* Pastikan hero-content mengambil lebar penuh container */
 }
 
 .hero-text {
-    flex: 1.2;
+    flex: 1.2; /* Give slightly more space to text */
     animation: slideInFromLeft 1s ease-out;
+    z-index: 2; /* Pastikan teks di atas gambar jika ada overlap */
+    padding-right: 1rem; /* Add some padding if text is too close to image */
 }
 
 .hero-text h1 {
-    /* Uses var(--heading-color) from general h1 styling */
     margin-bottom: 0.5rem;
 }
 
@@ -340,10 +343,37 @@ header nav ul li a.active-link {
 
 .hero-text p {
     font-size: 1.1rem;
-    color: var(--text-color); /* Was #555 */
+    color: var(--text-color);
     margin-bottom: 2.5rem;
     max-width: 500px;
 }
+
+.hero-image {
+    flex: 1; /* Adjust flex basis if needed */
+    position: relative; /* Kunci untuk positioning slides */
+    aspect-ratio: 16 / 10; /* Maintain aspect ratio, adjust as desired */
+    max-height: calc(100vh - var(--header-height) - 4rem); /* Max height considering padding */
+    overflow: hidden; /* Penting agar slide tidak keluar dari rounded corners */
+    border-radius: 8px;
+    box-shadow: 0 10px 25px var(--shadow-color);
+}
+
+.hero-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Memastikan gambar menutupi area tanpa merusak aspek rasio */
+    opacity: 0;
+    transition: opacity 0.7s ease-in-out;
+}
+
+.hero-slide.active {
+    opacity: 1;
+    z-index: 1; /* Pastikan slide aktif di atas */
+}
+
 
 .cta-button, .cta-button-outline {
     display: inline-block;
@@ -364,7 +394,7 @@ header nav ul li a.active-link {
 .cta-button:hover {
     background-color: var(--accent-color);
     border-color: var(--accent-color);
-    color: var(--text-color-inverted);
+    color: var(--text-color-inverted); /* Ensure text is visible on accent bg */
     transform: translateY(-3px);
 }
 
@@ -379,27 +409,15 @@ header nav ul li a.active-link {
     transform: translateY(-3px);
 }
 
-.hero-image {
-    flex: 1;
-    text-align: right;
-    animation: fadeIn 1.5s ease-out;
-}
-.hero-image img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 10px 25px var(--shadow-color);
-}
-
 /* Animasi Sederhana */
 @keyframes slideInFromLeft {
     0% { transform: translateX(-100%); opacity: 0; }
     100% { transform: translateX(0); opacity: 1; }
 }
-@keyframes fadeIn {
+/* @keyframes fadeIn {  Not needed for hero-image container anymore
     0% { opacity: 0; }
     100% { opacity: 1; }
-}
+} */
 
 /* Content Sections General Styling */
 .content-section {
@@ -429,7 +447,7 @@ header nav ul li a.active-link {
 .tentang-text h3 {
     font-size: 1.6rem;
     margin-bottom: 1rem;
-    /* Uses var(--heading-color) */
+    color: var(--heading-color);
 }
 .tentang-text p {
     margin-bottom: 1.2rem;
@@ -458,7 +476,7 @@ header nav ul li a.active-link {
 .layanan-item h3 {
     font-size: 1.4rem;
     margin: 1rem 0 0.5rem;
-    /* Uses var(--heading-color) */
+    color: var(--heading-color);
 }
 .icon-layanan {
     font-size: 2.8rem;
@@ -508,6 +526,115 @@ header nav ul li a.active-link {
     transform: translateY(0);
 }
 
+/* Berita Section */
+.berita-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+.berita-item {
+    background: var(--card-bg);
+    border-radius: 8px;
+    box-shadow: 0 5px 15px var(--shadow-color);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.berita-item:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 25px var(--shadow-color);
+}
+.berita-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+.berita-content {
+    padding: 1.5rem;
+    flex-grow: 1; /* Allows content to fill space if items have different text lengths */
+    display: flex;
+    flex-direction: column;
+}
+.berita-title {
+    font-size: 1.3rem;
+    margin-bottom: 0.75rem;
+    color: var(--heading-color);
+}
+.berita-snippet {
+    font-size: 0.95rem;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+    flex-grow: 1; /* Snippet takes available space before link */
+}
+.berita-link {
+    font-weight: 500;
+    color: var(--accent-color);
+    text-decoration: none;
+    align-self: flex-start; /* Align link to the start of the flex container */
+}
+.berita-link:hover {
+    text-decoration: underline;
+    color: var(--link-hover-color);
+}
+.berita-link i {
+    margin-left: 0.3rem;
+    transition: transform 0.2s ease-in-out;
+}
+.berita-link:hover i {
+    transform: translateX(3px);
+}
+
+
+/* Kolaborasi Section */
+.kolaborasi-showcase {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+.kolaborasi-item {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    align-items: center;
+    gap: 2rem;
+    padding: 2rem;
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    box-shadow: 0 5px 15px var(--shadow-color);
+}
+.kolaborasi-image {
+    flex: 1;
+    min-width: 150px; /* Minimum width for the logo container */
+    max-width: 200px; /* Maximum width for the logo */
+    margin: 0 auto; /* Center logo if it's smaller than container */
+}
+.kolaborasi-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px; /* Optional: if logo has a background */
+}
+.kolaborasi-text {
+    flex: 2;
+    min-width: 280px; /* Minimum width for text content */
+}
+.kolaborasi-text h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--heading-color);
+}
+.kolaborasi-text p {
+    margin-bottom: 1.5rem;
+}
+.kolaborasi-item.kolaborasi-future {
+    background-color: var(--light-gray-color); /* Differentiate future/CTA section */
+}
+html.dark-theme .kolaborasi-item.kolaborasi-future {
+    background-color: var(--white-color-dark); /* Use the dark theme's card background */
+}
+
+
 /* Kontak Section */
 .kontak-content {
     display: flex;
@@ -522,19 +649,22 @@ header nav ul li a.active-link {
 .kontak-info h3, .kontak-form h3 {
     font-size: 1.5rem;
     margin-bottom: 1.5rem;
-    /* Uses var(--heading-color) */
+    color: var(--heading-color);
 }
 .kontak-info p {
     margin-bottom: 1rem;
     line-height: 1.6;
 }
 .kontak-info p strong {
-    color: var(--heading-color);
+    color: var(--heading-color); /* Use heading color for better emphasis */
     font-weight: 500;
+}
+.kontak-info a { /* Contact info links */
+    color: var(--accent-color); /* Make contact links stand out with accent */
 }
 .kontak-info a:hover {
     text-decoration: underline;
-    color: var(--accent-color); /* Kept specific for contact links */
+    color: var(--link-hover-color);
 }
 
 .social-icons {
@@ -584,6 +714,7 @@ header nav ul li a.active-link {
 .form-group textarea:focus {
     border-color: var(--input-focus-border);
     box-shadow: 0 0 0 2px var(--input-focus-shadow);
+    background-color: var(--card-bg); /* Slightly different bg on focus for inputs */
 }
 
 .form-group textarea {
@@ -594,7 +725,6 @@ header nav ul li a.active-link {
     width: 100%;
     padding: 1rem;
 }
-/* .kontak-form button[type="submit"]:hover uses .cta-button:hover styles */
 
 /* Footer */
 footer {
@@ -615,41 +745,75 @@ footer a {
     transition: color 0.3s ease;
 }
 footer a:hover {
-    color: var(--accent-color);
+    color: var(--accent-color); /* Use universal accent for hover */
 }
 
-/* Placeholder Image Styling */
-.hero-image img[src*="placeholder"],
-.tentang-image img[src*="placeholder"],
-.galeri-item img[src*="placeholder"] {
-    background-color: #e9e9e9; /* Light placeholder bg, may need dark theme variant if visible */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #aaa; /* Light placeholder text */
+/* Placeholder Image Styling (Enhanced) */
+img[src*="placeholder"],
+img[src="img/placeholder-news-1.jpg"],
+img[src="img/placeholder-news-2.jpg"],
+img[src="img/placeholder-news-3.jpg"],
+img[src="img/artebelle-logo.png"],
+img[src="img/placeholder-partner-logo.png"],
+img[src="img/hero-slide-2.jpg"], /* Add hero slide placeholders here */
+img[src="img/hero-slide-3.jpg"],
+img[src="img/hero-slide-4.jpg"],
+img[src="img/hero-slide-5.jpg"] {
+    background-color: #e9e9e9;
+    /* display: flex;  Only if NO src is provided */
+    /* align-items: center; */
+    /* justify-content: center; */
+    color: #aaa;
     font-style: italic;
     text-align: center;
     font-size: 0.9rem;
     line-height: 1.4;
-    padding: 1rem;
-}
-html.dark-theme .hero-image img[src*="placeholder"],
-html.dark-theme .tentang-image img[src*="placeholder"],
-html.dark-theme .galeri-item img[src*="placeholder"] {
-    background-color: #333; /* Darker placeholder bg */
-    color: #777; /* Lighter placeholder text for dark bg */
+    /* padding: 1rem; Padding can interfere with object-fit */
+    width: 100%; /* Ensure placeholder takes full width of its container */
+    /* border: 1px dashed #ccc; Optional: make placeholder more obvious */
 }
 
-.hero-image img[src*="placeholder"] { min-height: 350px; }
-.tentang-image img[src*="placeholder"] { min-height: 250px; }
-.galeri-item img[src*="placeholder"] { min-height: 280px; }
+html.dark-theme img[src*="placeholder"],
+html.dark-theme img[src="img/placeholder-news-1.jpg"],
+html.dark-theme img[src="img/placeholder-news-2.jpg"],
+html.dark-theme img[src="img/placeholder-news-3.jpg"],
+html.dark-theme img[src="img/artebelle-logo.png"],
+html.dark-theme img[src="img/placeholder-partner-logo.png"],
+html.dark-theme img[src="img/hero-slide-2.jpg"],
+html.dark-theme img[src="img/hero-slide-3.jpg"],
+html.dark-theme img[src="img/hero-slide-4.jpg"],
+html.dark-theme img[src="img/hero-slide-5.jpg"] {
+    background-color: #333;
+    color: #777;
+    /* border-color: #555; */
+}
 
-.hero-image img[src="placeholder-hero.jpg"]::before { content: "Placeholder Hero Image\A (Ideal: 16:9 atau landscape)"; white-space: pre; }
-.tentang-image img[src="img/logo duste.jpg"]::before { content: "Placeholder About Us Image\A (Ideal: 4:3 atau landscape)"; white-space: pre; }
-.galeri-item img[src="placeholder-gallery-1.jpg"]::before { content: "Galeri 1 (1:1)"; }
-.galeri-item img[src="placeholder-gallery-2.jpg"]::before { content: "Galeri 2 (1:1)"; }
-.galeri-item img[src="placeholder-gallery-3.jpg"]::before { content: "Galeri 3 (1:1)"; }
-.galeri-item img[src="placeholder-gallery-4.jpg"]::before { content: "Galeri 4 (1:1)"; }
+/* Specific placeholder content text (remove if using actual images) */
+/* These ::before pseudo-elements will only show if the image src is broken or not loaded */
+img[src="img/placeholder-news-1.jpg"]::before { content: "News Image 1\A (e.g., 16:9 or 4:3)"; white-space: pre; }
+img[src="img/placeholder-news-2.jpg"]::before { content: "News Image 2\A (e.g., 16:9 or 4:3)"; white-space: pre; }
+img[src="img/placeholder-news-3.jpg"]::before { content: "News Image 3\A (e.g., 16:9 or 4:3)"; white-space: pre; }
+img[src="img/artebelle-logo.png"]::before { content: "Artebelle Logo\A (Company Logo)"; white-space: pre; }
+img[src="img/placeholder-partner-logo.png"]::before { content: "Partner Logo\A (Company Logo)"; white-space: pre; }
+img[src="img/hero-slide-2.jpg"]::before { content: "Hero Slide 2\A (16:9 atau landscape)"; white-space: pre; }
+img[src="img/hero-slide-3.jpg"]::before { content: "Hero Slide 3\A (16:9 atau landscape)"; white-space: pre; }
+img[src="img/hero-slide-4.jpg"]::before { content: "Hero Slide 4\A (16:9 atau landscape)"; white-space: pre; }
+img[src="img/hero-slide-5.jpg"]::before { content: "Hero Slide 5\A (16:9 atau landscape)"; white-space: pre; }
+
+/* Remove placeholder styles for actual images */
+img[src="img/pelayaran.jpg"].hero-slide,
+img[src="img/logo duste.jpg"],
+.galeri-item img:not([src*="placeholder"]) { /* Target gallery images that are not placeholders */
+    background-color: transparent;
+    border: none;
+    padding: 0;
+}
+html.dark-theme img[src="img/pelayaran.jpg"].hero-slide,
+html.dark-theme img[src="img/logo duste.jpg"],
+html.dark-theme .galeri-item img:not([src*="placeholder"]) {
+    background-color: transparent;
+    border: none;
+}
 
 
 /* Responsive Design */
@@ -660,17 +824,19 @@ html.dark-theme .galeri-item img[src*="placeholder"] {
     }
     .hero-text {
         max-width: 100%;
-        margin-bottom: 2.5rem;
+        margin-bottom: 1.5rem; /* Reduced margin */
+        order: 2; /* Teks di bawah gambar pada mobile */
+        padding-right: 0; /* Remove padding for centered text */
     }
     .hero-image {
-        margin-top: 2rem;
-        text-align: center;
-        width: 100%;
-    }
-    .hero-image img {
-        max-width: 70%;
+        margin-top: 0; /* Hapus margin-top jika teks di bawah */
+        order: 1; /* Gambar di atas teks */
+        width: 100%; /* Ambil lebar penuh dari kolomnya */
+        max-width: 550px; /* Batasi lebar maksimum gambar di tablet */
         margin-left: auto;
         margin-right: auto;
+        aspect-ratio: 16 / 10; /* Keep aspect ratio */
+        max-height: 60vh; /* Adjust max height */
     }
 
     .tentang-content {
@@ -685,6 +851,14 @@ html.dark-theme .galeri-item img[src*="placeholder"] {
     }
     .tentang-text {
         max-width: 100%;
+    }
+
+    .kolaborasi-item {
+        flex-direction: column; /* Stack image and text vertically */
+        text-align: center;
+    }
+    .kolaborasi-image {
+        margin-bottom: 1rem; /* Add space between logo and text */
     }
 
     .kontak-content {
@@ -710,7 +884,7 @@ html.dark-theme .galeri-item img[src*="placeholder"] {
 
 @media (max-width: 768px) {
     html {
-        font-size: 93.75%;
+        font-size: 93.75%; /* 15px base */
     }
 
     :root {
@@ -723,19 +897,19 @@ html.dark-theme .galeri-item img[src*="placeholder"] {
     .section-subtitle { font-size: 1rem; margin-bottom: 2rem;}
 
     header nav {
-        display: none;
+        display: none; /* Initially hidden */
         position: absolute;
-        top: 100%;
+        top: 100%; /* Position below the header */
         left: 0;
         width: 100%;
-        background: var(--card-bg);
+        background: var(--card-bg); /* Match header background */
         flex-direction: column;
         border-top: 1px solid var(--border-color);
         box-shadow: 0 3px 8px var(--shadow-color);
-        max-height: calc(100vh - var(--header-height));
-        overflow-y: auto;
+        max-height: calc(100vh - var(--header-height)); /* Limit height */
+        overflow-y: auto; /* Scroll if content exceeds height */
     }
-    header nav.active {
+    header nav.active { /* Class added by JS to show menu */
         display: flex;
     }
     header nav ul {
@@ -743,77 +917,68 @@ html.dark-theme .galeri-item img[src*="placeholder"] {
         width: 100%;
     }
     header nav ul li {
-        margin: 0;
-        text-align: left;
+        margin: 0; /* Remove left margin */
+        text-align: left; /* Align text to the left */
     }
     header nav ul li a {
-        display: block;
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid var(--border-color);
+        display: block; /* Make links full width */
+        padding: 1rem 1.5rem; /* Add padding */
+        border-bottom: 1px solid var(--border-color); /* Separator */
+        font-size: 1rem; /* Adjust font size for mobile nav */
     }
     header nav ul li a:hover,
-    header nav ul li a.active-link {
-        background-color: var(--light-gray-color);
+    header nav ul li a.active-link { /* Style for hover/active */
+        background-color: var(--light-gray-color); /* Use theme variable */
         color: var(--accent-color);
-        border-bottom-color: var(--light-gray-color); /* Or var(--border-color) to match */
+        border-bottom-color: var(--light-gray-color); /* Or var(--border-color) */
     }
     html.dark-theme header nav ul li a:hover,
     html.dark-theme header nav ul li a.active-link {
-        background-color: var(--light-gray-color); /* this is a dark bg in dark theme */
-        color: var(--accent-color);
-        border-bottom-color: var(--light-gray-color);
+        background-color: var(--background-color-dark); /* A slightly different shade */
+        color: var(--accent-color-dark);
+        border-bottom-color: var(--background-color-dark);
     }
 
-    header nav ul li a::after {
+
+    header nav ul li a::after { /* Hide underline effect on mobile */
         display: none;
     }
-    header nav ul li:last-child a {
+    header nav ul li:last-child a { /* Remove border from last item */
         border-bottom: none;
     }
 
     .menu-toggle {
-        display: block;
+        display: block; /* Show menu toggle button */
     }
     
-    /* Adjusting controls and menu toggle order for mobile */
-    .header-container {
-        /* Default: Logo | Nav | Controls | MenuToggle (hidden on desktop) */
-        /* Mobile: MenuToggle | Logo | Controls (Nav is absolute) */
-    }
     .menu-toggle {
         order: -1; /* Puts menu toggle to the far left */
         margin-right: 10px; /* Space between menu toggle and logo */
     }
-    .logo-link {
-        /* Logo takes remaining space or is centered if desired */
-        /* flex-grow: 1; text-align: center; (if centering logo) */
-    }
     .controls {
         margin-left: auto; /* Pushes controls to the right, after logo */
     }
-    header nav#main-nav { /* Ensure nav isn't influencing flex layout when hidden */
-        /* position: absolute; already set for mobile */
+
+    .hero-image {
+        aspect-ratio: 4 / 3; /* Adjust aspect ratio for mobile */
+        max-width: 100%; /* Lebar penuh pada mobile yang lebih kecil */
+        max-height: 50vh;
     }
 
-
-    .hero-content { gap: 2rem; }
-    .hero-text p { font-size: 1rem; }
-    .hero-image img { max-width: 85%; }
-
-    .tentang-content { gap: 2rem; }
-    .tentang-image { max-width: 80%; }
-
     .layanan-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr; /* Stack items */
         gap: 1.5rem;
     }
     .layanan-item { padding: 2rem 1.5rem; }
+
+    .berita-grid {
+        grid-template-columns: 1fr; /* Stack news items */
+    }
 
     .galeri-grid {
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 1rem;
     }
-    /* .galeri-item img { height: 220px; } Removed to rely on aspect-ratio */
 
     .kontak-content { gap: 2rem; }
     .kontak-info p { font-size: 0.95rem; }
@@ -830,28 +995,44 @@ html.dark-theme .galeri-item img[src*="placeholder"] {
         width: 95%;
     }
     html {
-        font-size: 87.5%;
+        font-size: 87.5%; /* 14px base */
     }
     .cta-button, .cta-button-outline {
         padding: 12px 24px;
         font-size: 0.95rem;
     }
-    .hero-image img { max-width: 95%; }
-    .tentang-image { max-width: 90%; }
 
-    /* Stack controls vertically on very small screens */
+    header nav ul li {
+        /* margin-left: 15px; Not needed for column layout */
+    }
+    header nav ul li a {
+        font-size: 0.9rem; /* Further reduce for very small nav */
+    }
+
     .controls {
-        flex-direction: column;
-        align-items: flex-end; /* Align to the right edge */
-        gap: 0.3rem;
-        position: relative; /* Needed if items inside are to be full width of this container */
+        flex-direction: row; /* Keep controls in a row if space allows */
+        gap: 0.4rem; /* Adjust gap */
     }
     #theme-toggle, .lang-button {
-        min-width: 40px; /* Ensure buttons are tappable */
+        min-width: 38px; /* Ensure buttons are tappable */
         padding: 0.3rem 0.5rem;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
     }
     .lang-button {
-        min-width: 40px; /* Consistent width */
+        min-width: 38px; /* Consistent width */
+    }
+    .logo {
+        height: 45px; /* Slightly smaller logo */
+    }
+    .menu-toggle {
+        margin-right: 5px; /* Reduce space */
+    }
+
+    .hero-image {
+        aspect-ratio: 3 / 2; /* Adjust aspect ratio for very small mobile */
+        max-height: 45vh;
+    }
+    .hero-text p {
+        font-size: 1rem;
     }
 }
