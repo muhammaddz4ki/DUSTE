@@ -101,25 +101,23 @@ document.addEventListener('DOMContentLoaded', () => {
     async function setLanguage(lang) {
         if (!lang || (lang !== 'id' && lang !== 'en')) lang = 'id'; // Fallback
 
-        // Hanya muat jika terjemahan belum ada atau bahasa berubah
         if (!siteTranslations[lang]) {
             const newTranslations = await loadTranslations(lang);
             if (newTranslations) {
                 siteTranslations[lang] = newTranslations;
             } else {
                 console.error(`Gagal memuat terjemahan untuk "${lang}". Menggunakan bahasa sebelumnya atau default.`);
-                // Jika bahasa saat ini gagal dimuat, jangan ubah currentLang kecuali ini adalah pemuatan awal
-                if (Object.keys(siteTranslations).length === 0) { // Jika belum ada terjemahan sama sekali
-                    currentLang = 'id'; // Default keras
+                if (Object.keys(siteTranslations).length === 0) { 
+                    currentLang = 'id'; 
                     docElement.lang = currentLang;
                 }
-                updateTexts(); // Coba update dengan apa pun yang ada
+                updateTexts(); 
                 updateThemeButtonAriaLabel();
-                return; // Keluar jika gagal memuat terjemahan baru
+                return; 
             }
         }
 
-        currentLang = lang; // Tetapkan bahasa saat ini setelah berhasil memuat (jika perlu)
+        currentLang = lang; 
         localStorage.setItem('language', currentLang);
 
         updateTexts();
@@ -130,6 +128,46 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Hero Slideshow Logic ---
+    const heroSlides = document.querySelectorAll('.hero-slide');
+    let currentSlideIndex = 0;
+    const slideIntervalTime = 3000; // 3 detik
+    let heroIntervalId; // Untuk menyimpan ID interval
+
+    function showNextHeroSlide() {
+        if (heroSlides.length === 0) return;
+
+        heroSlides[currentSlideIndex].classList.remove('active');
+        currentSlideIndex = (currentSlideIndex + 1) % heroSlides.length;
+        heroSlides[currentSlideIndex].classList.add('active');
+    }
+
+    function startHeroSlideshow() {
+        if (heroSlides.length > 1) {
+            if (!heroSlides[0].classList.contains('active') && currentSlideIndex === 0) {
+                 heroSlides[0].classList.add('active'); // Pastikan slide pertama aktif saat mulai
+            }
+            heroIntervalId = setInterval(showNextHeroSlide, slideIntervalTime);
+        } else if (heroSlides.length === 1 && !heroSlides[0].classList.contains('active')) {
+             heroSlides[0].classList.add('active'); // Jika hanya 1 slide, pastikan tetap terlihat
+        }
+    }
+    
+    function stopHeroSlideshow() {
+        clearInterval(heroIntervalId);
+    }
+
+    // Mulai slideshow
+    startHeroSlideshow();
+    // Opsional: Hentikan slideshow saat hover di atas gambar hero
+    const heroImageContainer = document.querySelector('.hero-image');
+    if (heroImageContainer) {
+        heroImageContainer.addEventListener('mouseenter', stopHeroSlideshow);
+        heroImageContainer.addEventListener('mouseleave', startHeroSlideshow);
+    }
+    // --- End Hero Slideshow Logic ---
+
+
     // --- Bagian 3: Logika Event Listener & Inisialisasi ---
 
     // Toggle Menu Mobile
@@ -137,11 +175,20 @@ document.addEventListener('DOMContentLoaded', () => {
         menuToggle.addEventListener('click', () => {
             const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
             mainNav.classList.toggle('active');
-            menuToggle.setAttribute('aria-expanded', !isExpanded);
-            // Teks tombol akan diatur oleh updateTexts jika ada data-lang-key
-            if (!menuToggle.dataset.langKeyAriaLabel) {
-                menuToggle.textContent = mainNav.classList.contains('active') ? '✕' : '☰';
+            menuToggle.setAttribute('aria-expanded', String(!isExpanded));
+            
+            const menuToggleLabelKey = "menuToggleLabel"; // Kunci untuk aria-label
+            const menuToggleTextOpen = siteTranslations[currentLang]?.[menuToggleLabelKey] || "Toggle menu"; // Fallback
+            const menuToggleTextClose = siteTranslations[currentLang]?.['menuToggleLabelClose'] || "Close menu"; // Tambahkan key baru jika perlu, atau gunakan simbol
+
+            if(mainNav.classList.contains('active')) {
+                menuToggle.setAttribute('aria-label', menuToggleTextClose);
+                // menuToggle.innerHTML = '<i class="fas fa-times"></i>'; // Simbol X jika aktif
+            } else {
+                menuToggle.setAttribute('aria-label', menuToggleTextOpen);
+                // menuToggle.innerHTML = '☰'; // Simbol hamburger jika tidak aktif
             }
+            // Jika menggunakan teks dari data-lang-key-aria-label, pastikan itu terupdate oleh updateTexts()
         });
     }
 
@@ -149,17 +196,30 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             const targetHref = this.getAttribute('href');
-            if (targetHref.startsWith('#') && targetHref.length > 1) {
+            if (targetHref.startsWith('#') && targetHref.length > 1 && targetHref !== '#privasi' && targetHref !== '#syarat') { // Hindari untuk link footer dummy
                 e.preventDefault();
                 if (mainNav && mainNav.classList.contains('active')) {
                     mainNav.classList.remove('active');
                     if (menuToggle) {
                         menuToggle.setAttribute('aria-expanded', 'false');
-                        if (!menuToggle.dataset.langKeyAriaLabel) menuToggle.textContent = '☰';
+                        // Update aria-label dan teks/ikon menu toggle di sini jika diperlukan
+                        const menuToggleLabelKey = "menuToggleLabel";
+                        const menuToggleTextOpen = siteTranslations[currentLang]?.[menuToggleLabelKey] || "Toggle menu";
+                        menuToggle.setAttribute('aria-label', menuToggleTextOpen);
+                        // menuToggle.innerHTML = '☰';
                     }
                 }
                 const targetElement = document.querySelector(targetHref);
-                if (targetElement) targetElement.scrollIntoView({ behavior: 'smooth' });
+                if (targetElement) {
+                    const headerOffset = document.querySelector('header').offsetHeight;
+                    const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+                    const offsetPosition = elementPosition - headerOffset;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
             }
         });
     });
@@ -181,28 +241,54 @@ document.addEventListener('DOMContentLoaded', () => {
         langButtons.forEach(button => {
             button.addEventListener('click', (e) => {
                 const newLang = e.target.dataset.lang;
-                if (newLang !== currentLang || !siteTranslations[newLang]) { // Muat jika bahasa baru atau belum dimuat
+                if (newLang !== currentLang || !siteTranslations[newLang]) { 
                     setLanguage(newLang);
                 }
             });
         });
     }
+    
+    // Active Nav Link Highlighting on Scroll
+    const sections = document.querySelectorAll('main section[id]');
+    const navLinks = document.querySelectorAll('header nav ul li a');
+
+    function changeNavActiveState() {
+        let index = sections.length;
+        const headerHeight = document.querySelector('header').offsetHeight;
+
+        while(--index && window.scrollY + headerHeight + 50 < sections[index].offsetTop) {}
+        
+        navLinks.forEach((link) => link.classList.remove('active-link'));
+        // Pastikan link yang sesuai ada sebelum menambahkan kelas
+        if (sections[index] && navLinks[index]) {
+             // Cek apakah href dari link cocok dengan ID section
+            const targetLink = Array.from(navLinks).find(link => link.getAttribute('href') === `#${sections[index].id}`);
+            if (targetLink) {
+                targetLink.classList.add('active-link');
+            }
+        } else if (window.scrollY < sections[0].offsetTop - headerHeight - 50) {
+            // Jika di paling atas, set Beranda sebagai aktif
+            const homeLink = document.querySelector('header nav ul li a[href="#hero"]');
+            if (homeLink) {
+                navLinks.forEach(a => a.classList.remove('active-link')); // Hapus semua dulu
+                homeLink.classList.add('active-link');
+            }
+        }
+    }
+    
+    // Panggil changeNavActiveState saat load dan scroll
+    window.addEventListener('scroll', changeNavActiveState);
+
 
     // Fungsi Inisialisasi Halaman Utama
     async function initializePage() {
-        // 1. Terapkan tema visual awal (ikon tombol)
-        // Kelas .dark-theme pada <html> sudah diatur oleh skrip inline di <head>
         const initialTheme = docElement.classList.contains('dark-theme') ? 'dark' : 'light';
-        if (currentThemeIcon) { // Pastikan ikon ada
-             currentThemeIcon.className = initialTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        if (currentThemeIcon) { 
+            currentThemeIcon.className = initialTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
         }
-
-        // 2. Muat dan terapkan bahasa awal
-        await setLanguage(currentLang); // Ini akan memuat JSON, update teks & label tombol tema
-
-        // 3. Panggil updateThemeButtonAriaLabel sekali lagi untuk memastikan label sudah benar
-        //    setelah bahasa dan tema awal diterapkan.
-        updateThemeButtonAriaLabel();
+        await setLanguage(currentLang); 
+        updateThemeButtonAriaLabel(); // Pastikan label tombol tema sudah benar setelah bahasa dimuat
+        changeNavActiveState(); // Set initial active nav link on load
     }
 
     initializePage(); // Panggil fungsi inisialisasi
